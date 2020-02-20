@@ -1,0 +1,28 @@
+version: 2
+
+jobs:
+  deploy:
+    docker:
+      - image: circleci/python:3.7
+    working_directory: ~/workspace
+    steps:
+      - run:
+          name: Install awscli
+          command: |
+            pip install --upgrade pip
+            pip install awscli aws-sam-cli
+      - checkout
+      - run:
+          name: deploy CFn
+          command: |
+            aws cloudformation deploy --template-file network.yaml --stack-name cfn-lesson --capabilities CAPABILITY_IAM
+
+workflows:
+  version: 2
+  default:
+    jobs:
+      - deploy:
+          context: aws
+          filters:
+            branches:
+              only: init
